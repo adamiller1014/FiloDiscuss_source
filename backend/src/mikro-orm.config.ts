@@ -4,6 +4,7 @@ import { __prod__ } from "./constants";
 import { Post } from "./entities/Post";
 import path from 'path';
 import { Migrator, TSMigrationGenerator } from '@mikro-orm/migrations';
+import { User } from "./entities/User";
 
 export default {
     migrations: {
@@ -11,7 +12,7 @@ export default {
         glob: '!(*.d).{js,ts}',
         generator: TSMigrationGenerator,
     },
-    entities: [Post],
+    entities: [Post, User],
     dbName: "filodiscuss",
     user: "postgres",
     password: "12345678",

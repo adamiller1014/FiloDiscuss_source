@@ -10,5 +10,7 @@
     "skipLibCheck": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "useUnknownInCatchVariables": false,
+    "allowSyntheticDefaultImports": true,
   }
 }

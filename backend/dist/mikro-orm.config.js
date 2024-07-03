@@ -8,13 +8,14 @@ const constants_1 = require("./constants");
 const Post_1 = require("./entities/Post");
 const path_1 = __importDefault(require("path"));
 const migrations_1 = require("@mikro-orm/migrations");
+const User_1 = require("./entities/User");
 exports.default = {
     migrations: {
         path: path_1.default.join(__dirname, "./migrations"),
         glob: '!(*.d).{js,ts}',
         generator: migrations_1.TSMigrationGenerator,
     },
-    entities: [Post_1.Post],
+    entities: [Post_1.Post, User_1.User],
     dbName: "filodiscuss",
     user: "postgres",
     password: "12345678",
