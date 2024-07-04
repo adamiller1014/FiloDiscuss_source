@@ -1,12 +1,19 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.apollo3Graph)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
 }
 
 android {
     namespace = "com.example.filodiscuss"
     compileSdk = 34
-
+    apollo {
+        service("service") {
+            packageName.set("com.example")
+        }
+    }
     defaultConfig {
         applicationId = "com.example.filodiscuss"
         minSdk = 24
@@ -69,4 +76,23 @@ dependencies {
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
+
+    //Apollo3
+    implementation(libs.apollo.runtime)
+
+    // OkHttp
+    implementation(libs.okhttp.logging)
+
+    // Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+
+    // coil
+    implementation(libs.coil)
+
+    // Runtime-Compose
+    implementation(libs.androidx.runtime)
+
+
+
 }
