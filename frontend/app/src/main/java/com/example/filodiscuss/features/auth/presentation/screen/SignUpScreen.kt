@@ -17,7 +17,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -30,18 +29,16 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.filodiscuss.features.auth.presentation.AuthViewModel
-import com.example.filodiscuss.features.auth.presentation.screen.components.HeaderText
-import com.example.filodiscuss.features.auth.presentation.screen.components.LoginTextField
-import com.example.filodiscuss.ui.theme.FiloDiscussTheme
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import com.example.filodiscuss.cors.navigation.Route
-import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.rememberNavController
+import com.example.filodiscuss.cors.navigation.Route
+import com.example.filodiscuss.features.auth.presentation.AuthViewModel
 import com.example.filodiscuss.features.auth.presentation.RegisterState
+import com.example.filodiscuss.features.auth.presentation.screen.components.HeaderText
+import com.example.filodiscuss.features.auth.presentation.screen.components.LoginTextField
+import com.example.filodiscuss.ui.theme.FiloDiscussTheme
 
 
 @Composable

@@ -4,12 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.filodiscuss.features.auth.domain.model.User
 import com.example.filodiscuss.features.auth.domain.repository.AuthRepository
-import com.example.filodiscuss.features.auth.domain.use_case.RegisterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -40,8 +37,8 @@ class AuthViewModel @Inject constructor(
 }
 
 sealed class RegisterState {
-    object Idle : RegisterState()
-    object Loading : RegisterState()
+    data object Idle : RegisterState()
+    data object Loading : RegisterState()
     data class Success(val user: User) : RegisterState()
     data class Error(val message: String) : RegisterState()
 }

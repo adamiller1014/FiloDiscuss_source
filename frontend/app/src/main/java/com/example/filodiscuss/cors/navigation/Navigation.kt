@@ -7,7 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.example.filodiscuss.features.auth.presentation.screen.HomeScreen
+import com.example.filodiscuss.features.home.presentation.screen.HomeScreen
 import com.example.filodiscuss.features.auth.presentation.screen.LoginScreen
 import com.example.filodiscuss.features.auth.presentation.screen.SignUpScreen
 
