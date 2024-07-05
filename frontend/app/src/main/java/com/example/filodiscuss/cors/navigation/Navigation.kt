@@ -11,12 +11,11 @@ import com.example.filodiscuss.features.auth.presentation.screen.HomeScreen
 import com.example.filodiscuss.features.auth.presentation.screen.LoginScreen
 import com.example.filodiscuss.features.auth.presentation.screen.SignUpScreen
 
-sealed class Route {
-    data class LoginScreen(val name: String = "Login") : Route()
-    data class SignUpScreen(val name: String = "SignUp") : Route()
-    data class HomeScreen(val name: String = "Home") : Route()
+sealed class Route(val name: String) {
+    data object LoginScreen : Route("Login")
+    data object SignUpScreen : Route("SignUp")
+    data object HomeScreen : Route("Home")
 }
-
 
 @Composable
 fun Navigation(navHostController: NavHostController) {
@@ -24,43 +23,29 @@ fun Navigation(navHostController: NavHostController) {
         navController = navHostController,
         startDestination = "login_flow",
     ) {
-        navigation(startDestination = Route.LoginScreen().name, route = "login_flow") {
-            composable(route = Route.LoginScreen().name) {
+        navigation(startDestination = Route.LoginScreen.name, route = "login_flow") {
+            composable(route = Route.LoginScreen.name) {
                 LoginScreen(
                     onLoginClick = {
-                        navHostController.navigate(
-                            Route.HomeScreen().name
-                        ) {
-                            popUpTo(route = "login_flow")
+                        navHostController.navigate(Route.HomeScreen.name) {
+                            popUpTo("login_flow") { inclusive = true }
                         }
                     },
                     onSignUpClick = {
-                        navHostController.navigateToSingleTop(
-                            Route.SignUpScreen().name
-                        )
+                        navHostController.navigateToSingleTop(Route.SignUpScreen.name)
                     }
                 )
             }
-            composable(route = Route.SignUpScreen().name) {
+            composable(route = Route.SignUpScreen.name) {
                 SignUpScreen(
-                    onSignUpClick = {
-                        navHostController.navigate(
-                            Route.HomeScreen().name
-                        ){
-                            popUpTo("login_flow")
-                        }
-                    },
                     onLoginClick = {
-                        navHostController.navigateToSingleTop(
-                            Route.LoginScreen().name
-                        )
+                        navHostController.navigateToSingleTop(Route.LoginScreen.name)
                     },
+                    navHostController = navHostController,
                 )
             }
-
-
         }
-        composable(route = Route.HomeScreen().name) {
+        composable(route = Route.HomeScreen.name) {
             HomeScreen()
         }
     }

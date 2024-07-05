@@ -11,7 +11,7 @@ android {
     compileSdk = 34
     apollo {
         service("service") {
-            packageName.set("com.example")
+            packageName.set("com.example.filodiscuss")
         }
     }
     defaultConfig {
@@ -45,6 +45,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -86,6 +87,7 @@ dependencies {
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
 
     // coil
     implementation(libs.coil)
@@ -93,6 +95,11 @@ dependencies {
     // Runtime-Compose
     implementation(libs.androidx.runtime)
 
-
+    // Lifecycle
+    val lifecycleVersion = "2.6.1"
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:$lifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
 
 }

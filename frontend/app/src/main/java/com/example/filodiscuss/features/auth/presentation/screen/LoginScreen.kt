@@ -45,7 +45,6 @@ fun LoginScreen(onLoginClick: () -> Unit, onSignUpClick: () -> Unit) {
     }
     val isFieldsEmpty = userName.isNotEmpty() && password.isNotEmpty()
 
-    val context = LocalContext.current
 
     Column(
         modifier = Modifier.fillMaxSize()
