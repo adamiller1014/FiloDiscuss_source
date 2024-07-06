@@ -1,6 +1,7 @@
 package com.example.filodiscuss.features.auth.presentation.screen
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,14 +12,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -52,6 +60,7 @@ fun SignUpScreen(
     val (password, onPasswordChange) = rememberSaveable { mutableStateOf("") }
     val context = LocalContext.current
     val isFieldsNotEmpty = username.isNotEmpty() && password.isNotEmpty()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     Column(
         modifier = Modifier
@@ -70,6 +79,7 @@ fun SignUpScreen(
             value = username,
             onValueChange = onUsernameChange,
             labelText = "Username",
+            leadingIcon = Icons.Default.Person,
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.height(16.dp))
@@ -77,8 +87,10 @@ fun SignUpScreen(
             value = password,
             onValueChange = onPasswordChange,
             labelText = "Password",
+            leadingIcon = Icons.Default.Lock,
             modifier = Modifier.fillMaxWidth(),
-            keyboardType = KeyboardType.Password
+            keyboardType = KeyboardType.Password,
+            visualTransformation = PasswordVisualTransformation()
         )
         Spacer(Modifier.height(16.dp))
         Button(
@@ -133,17 +145,15 @@ fun SignUpScreen(
                 navHostController.navigate(Route.HomeScreen.name) {
                     popUpTo("login_flow") { inclusive = true }
                 }
+            } else if (registerState is RegisterState.Error) {
+                snackbarHostState.showSnackbar((registerState as RegisterState.Error).message)
             }
         }
+    }
 
-        // Error message
-        if (registerState is RegisterState.Error) {
-            Text(
-                text = (registerState as RegisterState.Error).message,
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-        }
+    // Add SnackbarHost to display snackbars
+    Box(modifier = Modifier.fillMaxSize(), Alignment.BottomCenter){
+        SnackbarHost(hostState = snackbarHostState,)
     }
 }
 

@@ -14,11 +14,14 @@ class AnimistApi @Inject constructor(
     fun register(username: String, password: String): Flow<Result<User?>> {
         return flow {
             val response = apolloClient.mutation(RegisterMutation(username, password)).execute()
-            if (response.hasErrors()) {
-                emit(Result.failure(Exception(response.errors?.firstOrNull()?.message)))
+            val errors = response.data?.register?.errors
+            val user = response.data?.register?.user
+
+            if (response.hasErrors() || errors != null) {
+                val errorMessage = errors?.joinToString { it.message } ?: response.errors?.firstOrNull()?.message
+                emit(Result.failure(Exception(errorMessage ?: "Unknown error")))
             } else {
-                val user = response.data?.register?.user?.toDomain()
-                emit(Result.success(user))
+                emit(Result.success(user?.toDomain()))
             }
         }
     }
