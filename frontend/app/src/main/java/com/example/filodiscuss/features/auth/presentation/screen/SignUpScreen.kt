@@ -1,6 +1,5 @@
 package com.example.filodiscuss.features.auth.presentation.screen
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -43,9 +42,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.filodiscuss.cors.navigation.Route
 import com.example.filodiscuss.features.auth.presentation.AuthViewModel
-import com.example.filodiscuss.features.auth.presentation.RegisterState
 import com.example.filodiscuss.features.auth.presentation.screen.components.HeaderText
 import com.example.filodiscuss.features.auth.presentation.screen.components.LoginTextField
+import com.example.filodiscuss.features.auth.presentation.state.RegisterState
 import com.example.filodiscuss.ui.theme.FiloDiscussTheme
 
 
@@ -58,9 +57,9 @@ fun SignUpScreen(
     val registerState by authViewModel.registerState.collectAsStateWithLifecycle()
     val (username, onUsernameChange) = rememberSaveable { mutableStateOf("") }
     val (password, onPasswordChange) = rememberSaveable { mutableStateOf("") }
-    val context = LocalContext.current
     val isFieldsNotEmpty = username.isNotEmpty() && password.isNotEmpty()
     val snackbarHostState = remember { SnackbarHostState() }
+    val signInText = "Sign In"
 
     Column(
         modifier = Modifier
@@ -104,7 +103,6 @@ fun SignUpScreen(
         }
 
         Spacer(Modifier.height(16.dp))
-        val signInText = "Sign In"
         val signInAnnotation = buildAnnotatedString {
             withStyle(SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
                 append("Already have an account?")
@@ -118,16 +116,7 @@ fun SignUpScreen(
 
         ClickableText(
             text = signInAnnotation,
-            onClick = { offset ->
-                signInAnnotation.getStringAnnotations(
-                    tag = signInText,
-                    start = offset,
-                    end = offset
-                ).firstOrNull()?.let {
-                    Toast.makeText(context, "Sign in Clicked", Toast.LENGTH_SHORT).show()
-                    onLoginClick()
-                }
-            }
+            onClick = { onLoginClick() }
         )
 
         // Loading indicator

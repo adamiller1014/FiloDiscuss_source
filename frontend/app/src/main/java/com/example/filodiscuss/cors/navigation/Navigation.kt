@@ -26,14 +26,10 @@ fun Navigation(navHostController: NavHostController) {
         navigation(startDestination = Route.LoginScreen.name, route = "login_flow") {
             composable(route = Route.LoginScreen.name) {
                 LoginScreen(
-                    onLoginClick = {
-                        navHostController.navigate(Route.HomeScreen.name) {
-                            popUpTo("login_flow") { inclusive = true }
-                        }
-                    },
                     onSignUpClick = {
                         navHostController.navigateToSingleTop(Route.SignUpScreen.name)
-                    }
+                    },
+                    navHostController = navHostController,
                 )
             }
             composable(route = Route.SignUpScreen.name) {

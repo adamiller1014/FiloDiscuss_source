@@ -12,4 +12,8 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun register(username: String, password: String): Flow<Result<User?>> {
         return api.register(username, password)
     }
+
+    override suspend fun login(username: String, password: String): Flow<Result<User?>> {
+        return api.login(username, password)
+    }
 }
