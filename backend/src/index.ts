@@ -53,8 +53,8 @@ const main = async () => {
             cookie: {
                 maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // Alive for 10 years
                 httpOnly: true,
-                sameSite: "none", //csrf
-                secure: true // cookie only works in https
+                sameSite: "lax", //csrf
+                secure: process.env.NODE_ENV === 'production' // cookie only works in https
             },
             secret: "qpwdomwqeoxqiewpoqjh",
             resave: false,
