@@ -19,8 +19,15 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun okhttpClient(): OkHttpClient {
+    fun provideCookieJar(): UserCookieJar {
+        return UserCookieJar()
+    }
+
+    @Provides
+    @Singleton
+    fun okhttpClient(cookieJar : UserCookieJar): OkHttpClient {
         return OkHttpClient.Builder()
+            .cookieJar(cookieJar)
             .addInterceptor(
                 HttpLoggingInterceptor()
                     .apply {

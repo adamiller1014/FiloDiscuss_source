@@ -16,4 +16,8 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun login(username: String, password: String): Flow<Result<User?>> {
         return api.login(username, password)
     }
+
+    override suspend fun getCurrentUser(): Flow<Result<User?>> {
+        return api.getCurrentUser()
+    }
 }

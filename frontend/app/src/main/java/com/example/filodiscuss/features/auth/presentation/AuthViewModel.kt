@@ -2,6 +2,7 @@ package com.example.filodiscuss.features.auth.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.filodiscuss.features.auth.domain.model.User
 import com.example.filodiscuss.features.auth.domain.repository.AuthRepository
 import com.example.filodiscuss.features.auth.presentation.state.LoginState
 import com.example.filodiscuss.features.auth.presentation.state.RegisterState
@@ -21,6 +22,10 @@ class AuthViewModel @Inject constructor(
 
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     val loginState: StateFlow<LoginState> = _loginState
+
+
+    private val _currentUserState = MutableStateFlow<User?>(null)
+    val currentUserState: StateFlow<User?> = _currentUserState
 
     fun register(username: String, password: String) {
         _registerState.value = RegisterState.Loading
@@ -51,6 +56,18 @@ class AuthViewModel @Inject constructor(
                     }
                 }.onFailure { exception ->
                     _loginState.value = LoginState.Error(exception.message ?: "Unknown error")
+                }
+            }
+        }
+    }
+
+    fun getCurrentUser() {
+        viewModelScope.launch {
+            authRepository.getCurrentUser().collect { result ->
+                result.onSuccess { user ->
+                    _currentUserState.value = user
+                }.onFailure { exception ->
+                    _currentUserState.value = null
                 }
             }
         }

@@ -2,6 +2,7 @@ package com.example.filodiscuss.features.auth.data.network.api
 
 import com.apollographql.apollo3.ApolloClient
 import com.example.filodiscuss.LoginMutation
+import com.example.filodiscuss.MeQuery
 import com.example.filodiscuss.RegisterMutation
 import com.example.filodiscuss.features.auth.data.network.mapper.toDomain
 import com.example.filodiscuss.features.auth.domain.model.User
@@ -38,6 +39,18 @@ class AnimistApi @Inject constructor(
                 emit(Result.failure(Exception(errorMessage ?: "Unknown error")))
             } else {
                 emit(Result.success(user?.toDomain()))
+            }
+        }
+    }
+
+    fun getCurrentUser(): Flow<Result<User?>> {
+        return flow {
+            val response = apolloClient.query(MeQuery()).execute()
+            if (response.hasErrors()) {
+                emit(Result.failure(Exception(response.errors?.firstOrNull()?.message)))
+            } else {
+                val user = response.data?.me?.toDomain()
+                emit(Result.success(user))
             }
         }
     }
