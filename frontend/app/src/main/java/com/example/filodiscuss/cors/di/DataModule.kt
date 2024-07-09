@@ -1,4 +1,4 @@
-package com.example.filodiscuss.features.auth.data.di
+package com.example.filodiscuss.cors.di
 
 import com.example.filodiscuss.features.auth.data.repository.AuthRepositoryImpl
 import com.example.filodiscuss.features.auth.domain.repository.AuthRepository
@@ -12,5 +12,5 @@ import dagger.hilt.components.SingletonComponent
 abstract class DataModule {
 
     @Binds
-    abstract fun bindsUserRepository(impl: AuthRepositoryImpl) : AuthRepository
+    abstract fun bindsAuthRepository(impl: AuthRepositoryImpl) : AuthRepository
 }

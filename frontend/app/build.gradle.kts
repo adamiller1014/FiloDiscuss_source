@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.apollo3Graph)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    kotlin("plugin.serialization") version "1.6.0"
 }
 
 android {
@@ -101,5 +102,13 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
+
+
+    // Serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+
+    // SharedPreferences
+    implementation ("androidx.datastore:datastore-preferences:1.0.0")
+
 
 }

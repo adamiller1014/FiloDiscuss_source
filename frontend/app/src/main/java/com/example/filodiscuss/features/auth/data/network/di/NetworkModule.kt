@@ -1,11 +1,14 @@
 package com.example.filodiscuss.features.auth.data.network.di
 
+import android.content.Context
 import com.apollographql.apollo3.ApolloClient
 import com.apollographql.apollo3.network.okHttpClient
 import com.example.filodiscuss.BuildConfig
+import com.example.filodiscuss.features.auth.data.local.PreferencesLocal
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -19,8 +22,14 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideCookieJar(): UserCookieJar {
-        return UserCookieJar()
+    fun providePreferencesLocal(@ApplicationContext context: Context): PreferencesLocal {
+        return PreferencesLocal(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCookieJar(preferencesLocal: PreferencesLocal): UserCookieJar {
+        return UserCookieJar(preferencesLocal)
     }
 
     @Provides

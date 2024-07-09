@@ -27,6 +27,10 @@ class AuthViewModel @Inject constructor(
     private val _currentUserState = MutableStateFlow<User?>(null)
     val currentUserState: StateFlow<User?> = _currentUserState
 
+    private val _checkCookieValidity = MutableStateFlow<Boolean?>(null)
+    val checkCookieValidity: StateFlow<Boolean?> = _checkCookieValidity
+
+
     fun register(username: String, password: String) {
         _registerState.value = RegisterState.Loading
         viewModelScope.launch {
@@ -66,8 +70,20 @@ class AuthViewModel @Inject constructor(
             authRepository.getCurrentUser().collect { result ->
                 result.onSuccess { user ->
                     _currentUserState.value = user
-                }.onFailure { exception ->
+                }.onFailure {
                     _currentUserState.value = null
+                }
+            }
+        }
+    }
+
+    fun checkCookieValidity() {
+        viewModelScope.launch {
+            authRepository.checkCookieValidity().collect { result ->
+                result.onSuccess { isValid ->
+                    _checkCookieValidity.value = isValid
+                }.onFailure {
+                    _checkCookieValidity.value = false
                 }
             }
         }

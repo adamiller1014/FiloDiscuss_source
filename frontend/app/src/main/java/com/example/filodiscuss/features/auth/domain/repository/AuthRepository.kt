@@ -9,4 +9,7 @@ interface AuthRepository {
     suspend fun login(username: String, password: String): Flow<Result<User?>>
 
     suspend fun getCurrentUser(): Flow<Result<User?>>
+
+    suspend fun checkCookieValidity(): Flow<Result<Boolean?>>
+
 }
