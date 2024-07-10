@@ -34,4 +34,11 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun logout(): Flow<Result<Unit>> {
+        return flow {
+            userCookieJar.clear()
+            emit(Result.success(Unit))
+        }
+    }
+
 }

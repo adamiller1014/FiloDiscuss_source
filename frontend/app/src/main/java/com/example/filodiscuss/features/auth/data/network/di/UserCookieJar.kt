@@ -19,4 +19,9 @@ class UserCookieJar @Inject constructor(private val preferencesLocal: Preference
     override fun loadForRequest(url: HttpUrl): List<Cookie> {
         return preferencesLocal.getCookie(url.host)?.let { listOf(it) } ?: emptyList()
     }
+
+    fun clear() {
+        cookieStore.clear()
+        preferencesLocal.clearCookies()
+    }
 }

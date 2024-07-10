@@ -25,7 +25,7 @@ import com.example.filodiscuss.features.auth.presentation.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(authViewModel: AuthViewModel = hiltViewModel()) {
+fun HomeScreen(authViewModel: AuthViewModel = hiltViewModel(), onLogoutClick: () -> Unit) {
     val currentUser by authViewModel.currentUserState.collectAsState()
     LaunchedEffect(Unit) {
         authViewModel.getCurrentUser()
@@ -45,7 +45,7 @@ fun HomeScreen(authViewModel: AuthViewModel = hiltViewModel()) {
                 actions = {
                     if (currentUser != null) {
                         Button(
-                            onClick = { /*authViewModel.logout()*/ },
+                            onClick = onLogoutClick,
                             colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
                         ) {
                             Text(text = "Logout", color = Color.White)

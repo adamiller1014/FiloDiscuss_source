@@ -1,5 +1,6 @@
 package com.example.filodiscuss.cors.navigation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -26,6 +27,7 @@ sealed class Route(val name: String) {
 fun Navigation(navHostController: NavHostController) {
     val authViewModel: AuthViewModel = hiltViewModel()
     val checkCookieValidity by authViewModel.checkCookieValidity.collectAsState()
+    val logoutState by authViewModel.logoutState.collectAsState()
 
     LaunchedEffect(Unit) {
         authViewModel.checkCookieValidity()
@@ -51,12 +53,25 @@ fun Navigation(navHostController: NavHostController) {
                     restoreState = true
                 }
             }
-            null -> {
-            }
+            null -> {}
         }
     }
 
-    // Initial destination should be a loading screen
+    LaunchedEffect(logoutState) {
+        if (logoutState) {
+            navHostController.navigate(Route.LoginScreen.name) {
+                popUpTo(navHostController.graph.findStartDestination().id) {
+                    inclusive = true
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+            }
+            authViewModel.resetLogoutState()
+        }
+    }
+
+
     NavHost(
         navController = navHostController,
         startDestination = Route.LoadingScreen.name
@@ -81,7 +96,11 @@ fun Navigation(navHostController: NavHostController) {
             )
         }
         composable(Route.HomeScreen.name) {
-            HomeScreen()
+            HomeScreen(
+                onLogoutClick = {
+                    authViewModel.logout()
+                }
+            )
         }
     }
 }

@@ -12,4 +12,5 @@ interface AuthRepository {
 
     suspend fun checkCookieValidity(): Flow<Result<Boolean?>>
 
+    suspend fun logout(): Flow<Result<Unit>>
 }

@@ -30,6 +30,8 @@ class AuthViewModel @Inject constructor(
     private val _checkCookieValidity = MutableStateFlow<Boolean?>(null)
     val checkCookieValidity: StateFlow<Boolean?> = _checkCookieValidity
 
+    private val _logoutState = MutableStateFlow<Boolean>(false)
+    val logoutState: StateFlow<Boolean> = _logoutState
 
     fun register(username: String, password: String) {
         _registerState.value = RegisterState.Loading
@@ -88,4 +90,21 @@ class AuthViewModel @Inject constructor(
             }
         }
     }
+
+    fun logout() {
+        viewModelScope.launch {
+            authRepository.logout().collect { result ->
+                result.onSuccess {
+                    _logoutState.value = true
+                }.onFailure {
+                    _logoutState.value = false
+                }
+            }
+        }
+    }
+
+    fun resetLogoutState() {
+        _logoutState.value = false
+    }
+
 }
