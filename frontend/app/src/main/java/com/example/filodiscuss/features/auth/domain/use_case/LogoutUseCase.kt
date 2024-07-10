@@ -7,7 +7,7 @@ import javax.inject.Inject
 class LogoutUseCase @Inject constructor(
     private val repository: AuthRepository
 ) {
-    suspend operator fun invoke(): Flow<Result<Unit>> {
+    suspend operator fun invoke(): Flow<Result<Boolean? /*Unit*/>> {
         return repository.logout()
     }
 }

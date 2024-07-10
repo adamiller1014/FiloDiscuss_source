@@ -94,8 +94,10 @@ class AuthViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             authRepository.logout().collect { result ->
-                result.onSuccess {
-                    _logoutState.value = true
+                result.onSuccess { res ->
+                    if (res != null) {
+                        _logoutState.value = res // true
+                    }
                 }.onFailure {
                     _logoutState.value = false
                 }

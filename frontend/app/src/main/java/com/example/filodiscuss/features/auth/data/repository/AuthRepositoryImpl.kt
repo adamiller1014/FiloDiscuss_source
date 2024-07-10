@@ -1,6 +1,5 @@
 package com.example.filodiscuss.features.auth.data.repository
 
-import com.example.filodiscuss.features.auth.data.local.PreferencesLocal
 import com.example.filodiscuss.features.auth.data.network.api.AnimistApi
 import com.example.filodiscuss.features.auth.data.network.di.UserCookieJar
 import com.example.filodiscuss.features.auth.domain.model.User
@@ -34,11 +33,12 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun logout(): Flow<Result<Unit>> {
-        return flow {
-            userCookieJar.clear()
-            emit(Result.success(Unit))
-        }
+    override suspend fun logout(): Flow<Result<Boolean? /*Unit*/>> {
+        return api.logout()
+//        return flow {
+//            userCookieJar.clear()
+//            emit(Result.success(Unit))
+//        }
     }
 
 }

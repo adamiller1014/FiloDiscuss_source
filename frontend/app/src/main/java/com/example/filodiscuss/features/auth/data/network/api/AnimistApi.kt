@@ -2,6 +2,7 @@ package com.example.filodiscuss.features.auth.data.network.api
 
 import com.apollographql.apollo3.ApolloClient
 import com.example.filodiscuss.LoginMutation
+import com.example.filodiscuss.LogoutMutation
 import com.example.filodiscuss.MeQuery
 import com.example.filodiscuss.RegisterMutation
 import com.example.filodiscuss.features.auth.data.network.mapper.toDomain
@@ -51,6 +52,18 @@ class AnimistApi @Inject constructor(
             } else {
                 val user = response.data?.me?.toDomain()
                 emit(Result.success(user))
+            }
+        }
+    }
+
+    fun logout(): Flow<Result<Boolean?>> {
+        return flow {
+            val response = apolloClient.mutation(LogoutMutation()).execute()
+            if (response.hasErrors()) {
+                emit(Result.failure(Exception(response.errors?.firstOrNull()?.message)))
+
+            } else {
+                emit(Result.success(response.data?.logout))
             }
         }
     }
