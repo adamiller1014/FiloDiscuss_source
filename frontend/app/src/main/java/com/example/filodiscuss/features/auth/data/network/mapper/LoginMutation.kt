@@ -5,7 +5,7 @@ import com.example.filodiscuss.features.auth.domain.model.User
 
 fun LoginMutation.User.toDomain(): User {
     return User(
-        id = this.id,
-        username = this.username
+        id = this.regularUser.id,
+        username = this.regularUser.username
     )
 }
