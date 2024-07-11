@@ -22,13 +22,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.filodiscuss.features.auth.presentation.AuthViewModel
+import com.example.filodiscuss.features.home.presentation.PostViewModel
+import com.example.filodiscuss.features.home.presentation.screen.components.PostList
+import com.example.filodiscuss.features.home.presentation.state.PostListState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(authViewModel: AuthViewModel = hiltViewModel(), onLogoutClick: () -> Unit) {
+fun HomeScreen(
+    authViewModel: AuthViewModel = hiltViewModel(),
+    postViewModel: PostViewModel = hiltViewModel(),
+    onLogoutClick: () -> Unit) {
     val currentUser by authViewModel.currentUserState.collectAsState()
+    val postListState by postViewModel.postListState.collectAsState()
+
     LaunchedEffect(Unit) {
         authViewModel.getCurrentUser()
+        postViewModel.getPosts()
     }
 
     Scaffold(
@@ -62,17 +71,31 @@ fun HomeScreen(authViewModel: AuthViewModel = hiltViewModel(), onLogoutClick: ()
                 Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
-                contentAlignment = Alignment.Center
+                //contentAlignment = Alignment.Center
             ) {
-                if (currentUser != null) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = "Hello, ${currentUser?.username}",
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                when (postListState) {
+                    is PostListState.Success -> {
+                        PostList(posts = (postListState as PostListState.Success).posts)
                     }
+                    PostListState.Loading -> {
+                        // Show loading indicator or placeholder
+                        Text(text = "Loading...")
+                    }
+                    is PostListState.Error -> {
+                        // Handle error state
+                        Text(text = "Error: ${(postListState as PostListState.Error).message}")
+                    }
+                    else -> {}
                 }
+//              if (currentUser != null) {
+//                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+//                       Text(
+//                            text = "Hello, ${currentUser?.username}",
+//                            fontSize = 24.sp,
+//                           fontWeight = FontWeight.Bold
+//                      )
+//                }
+//               }
             }
         }
     )
