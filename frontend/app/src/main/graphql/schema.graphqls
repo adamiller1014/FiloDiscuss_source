@@ -41,6 +41,8 @@ type User {
   updatedAt: String!
 
   username: String!
+
+  email: String!
 }
 
 type Mutation {
@@ -50,9 +52,13 @@ type Mutation {
 
   deletePost(id: Float!): Boolean!
 
+  changePassword(newPossword: String!, token: String!): UserResponse!
+
+  forgotPassword(email: String!): Boolean!
+
   register(options: UsernamePasswordInput!): UserResponse!
 
-  login(options: UsernamePasswordInput!): UserResponse!
+  login(password: String!, usernameOrEmail: String!): UserResponse!
 
   logout: Boolean!
 }
@@ -75,6 +81,8 @@ type FieldError {
 }
 
 input UsernamePasswordInput {
+  email: String!
+
   username: String!
 
   password: String!

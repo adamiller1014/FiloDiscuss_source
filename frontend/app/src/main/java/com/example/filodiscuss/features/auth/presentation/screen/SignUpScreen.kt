@@ -12,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
@@ -55,9 +56,10 @@ fun SignUpScreen(
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val registerState by authViewModel.registerState.collectAsStateWithLifecycle()
+    val (email, onEmailChange) = rememberSaveable { mutableStateOf("") }
     val (username, onUsernameChange) = rememberSaveable { mutableStateOf("") }
     val (password, onPasswordChange) = rememberSaveable { mutableStateOf("") }
-    val isFieldsNotEmpty = username.isNotEmpty() && password.isNotEmpty()
+    val isFieldsNotEmpty = email.isNotEmpty() && username.isNotEmpty() && password.isNotEmpty()
     val snackbarHostState = remember { SnackbarHostState() }
     val signInText = "Sign In"
 
@@ -74,6 +76,14 @@ fun SignUpScreen(
                 .padding(vertical = 16.dp)
                 .align(alignment = Alignment.Start)
         )
+        LoginTextField(
+            value = email,
+            onValueChange = onEmailChange,
+            labelText = "Email",
+            leadingIcon = Icons.Default.Email,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Spacer(Modifier.height(16.dp))
         LoginTextField(
             value = username,
             onValueChange = onUsernameChange,
@@ -94,7 +104,7 @@ fun SignUpScreen(
         Spacer(Modifier.height(16.dp))
         Button(
             onClick = {
-                authViewModel.register(username, password)
+                authViewModel.register(email, username, password)
             },
             modifier = Modifier.fillMaxWidth(),
             enabled = isFieldsNotEmpty,

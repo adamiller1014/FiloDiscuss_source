@@ -24,9 +24,11 @@ const post_1 = require("./resolvers/post");
 const user_1 = require("./resolvers/user");
 const connect_redis_1 = __importDefault(require("connect-redis"));
 const express_session_1 = __importDefault(require("express-session"));
-const redis_1 = require("redis");
+const ioredis_1 = __importDefault(require("ioredis"));
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
+    //sendEmail("azza@azza.com", "Hello there !");
     const orm = yield core_1.MikroORM.init(mikro_orm_config_1.default);
+    //await orm.em.nativeDelete(User, {});
     yield orm.getMigrator().up();
     // const post = orm.em.fork().create(Post, {
     //     title: 'Foo is Bar',
@@ -39,8 +41,13 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     app.set("Access-Control-Allow-Origin", "https://studio.apollographql.com");
     app.set("Access-Control-Allow-Credentials", true);
     // ___ Redis - set-up __
-    let redisClient = (0, redis_1.createClient)();
-    redisClient.connect().catch(console.error);
+    const redisClient = new ioredis_1.default();
+    redisClient.on("connect", () => {
+        console.log("Redis connected");
+    });
+    redisClient.on("error", (err) => {
+        console.error("Redis connection error:", err);
+    });
     let redisStore = new connect_redis_1.default({
         client: redisClient,
         prefix: "myapp:",
@@ -71,7 +78,8 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         context: ({ req, res }) => ({
             em: orm.em,
             req,
-            res
+            res,
+            redis: redisClient
         })
     });
     yield apolloServer.start();

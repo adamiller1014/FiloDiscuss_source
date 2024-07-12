@@ -13,9 +13,14 @@ import RedisStore from "connect-redis"
 import session from "express-session"
 import { createClient } from "redis"
 import { MyContext } from './types';
+import { sendEmail } from './utils/sendEmail';
+import { User } from './entities/User';
+import Redis from 'ioredis';
 
 const main = async () => {
+    //sendEmail("azza@azza.com", "Hello there !");
     const orm = await MikroORM.init(microConfig);
+    //await orm.em.nativeDelete(User, {});
     await orm.getMigrator().up();
     // const post = orm.em.fork().create(Post, {
     //     title: 'Foo is Bar',
@@ -32,8 +37,13 @@ const main = async () => {
     app.set("Access-Control-Allow-Credentials", true);
     // ___ Redis - set-up __
 
-    let redisClient = createClient()
-    redisClient.connect().catch(console.error)
+    const redisClient = new Redis();
+    redisClient.on("connect", () => {
+        console.log("Redis connected");
+    });
+    redisClient.on("error", (err) => {
+        console.error("Redis connection error:", err);
+    });
 
     let redisStore = new RedisStore({
         client: redisClient,
@@ -44,7 +54,7 @@ const main = async () => {
     const cors = {
         credentials: true,
         origin: "https://studio.apollographql.com",
-      };
+    };
 
     app.use(
         session({
@@ -67,15 +77,16 @@ const main = async () => {
             resolvers: [HelloResolver, PostResolver, UserResolver],
             validate: false
         }),
-        context: ({ req, res }) : MyContext => ({
+        context: ({ req, res }): MyContext => ({
             em: orm.em,
             req,
-            res
+            res,
+            redis: redisClient
         })
     });
 
     await apolloServer.start();
-    apolloServer.applyMiddleware({ app , cors});
+    apolloServer.applyMiddleware({ app, cors });
 
     // app.get('/', (_, res) => {
     //     res.send(" Hello ");

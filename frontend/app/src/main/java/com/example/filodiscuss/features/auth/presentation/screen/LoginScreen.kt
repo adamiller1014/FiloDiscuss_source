@@ -54,9 +54,9 @@ fun LoginScreen(
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val loginState by authViewModel.loginState.collectAsStateWithLifecycle()
-    val (username, setUsername) = rememberSaveable { mutableStateOf("") }
+    val (usernameOrEmail, setUsernameOrEmail) = rememberSaveable { mutableStateOf("") }
     val (password, setPassword) = rememberSaveable { mutableStateOf("") }
-    val isFieldsEmpty = username.isNotEmpty() && password.isNotEmpty()
+    val isFieldsEmpty = usernameOrEmail.isNotEmpty() && password.isNotEmpty()
     val snackbarHostState = remember { SnackbarHostState() }
 
 
@@ -72,9 +72,9 @@ fun LoginScreen(
                 .align(alignment = Alignment.Start)
         )
         LoginTextField(
-            value = username,
-            onValueChange = setUsername,
-            labelText = "Username",
+            value = usernameOrEmail,
+            onValueChange = setUsernameOrEmail,
+            labelText = "Username Or Email",
             leadingIcon = Icons.Default.Person,
             modifier = Modifier.fillMaxWidth()
         )
@@ -88,19 +88,19 @@ fun LoginScreen(
             keyboardType = KeyboardType.Password,
             visualTransformation = PasswordVisualTransformation()
         )
-        Spacer(Modifier.height(itemSpacing))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            TextButton(onClick = {}) {
-                Text("Forgot Password?")
-            }
-        }
+//        Spacer(Modifier.height(itemSpacing))
+//        Row(
+//            modifier = Modifier.fillMaxWidth(),
+//            horizontalArrangement = Arrangement.SpaceBetween
+//        ) {
+//            TextButton(onClick = {}) {
+//                Text("Forgot Password?")
+//            }
+//        }
         Spacer(Modifier.height(itemSpacing))
         Button(
             onClick = {
-                authViewModel.login(username, password)
+                authViewModel.login(usernameOrEmail, password)
             },
             modifier = Modifier.fillMaxWidth(),
             enabled = isFieldsEmpty

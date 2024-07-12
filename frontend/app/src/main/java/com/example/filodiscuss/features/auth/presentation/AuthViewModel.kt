@@ -33,10 +33,10 @@ class AuthViewModel @Inject constructor(
     private val _logoutState = MutableStateFlow<Boolean>(false)
     val logoutState: StateFlow<Boolean> = _logoutState
 
-    fun register(username: String, password: String) {
+    fun register(email: String,username: String, password: String) {
         _registerState.value = RegisterState.Loading
         viewModelScope.launch {
-            authRepository.register(username, password).collect { result ->
+            authRepository.register(email, username, password).collect { result ->
                 result.onSuccess { user ->
                     if (user != null) {
                         _registerState.value = RegisterState.Success(user)
@@ -50,10 +50,10 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun login(username: String, password: String) {
+    fun login(usernameOrEmail: String, password: String) {
         _loginState.value = LoginState.Loading
         viewModelScope.launch {
-            authRepository.login(username, password).collect { result ->
+            authRepository.login(usernameOrEmail, password).collect { result ->
                 result.onSuccess { user ->
                     if (user != null) {
                         _loginState.value = LoginState.Success(user)

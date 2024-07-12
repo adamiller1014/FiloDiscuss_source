@@ -10,9 +10,9 @@ import javax.inject.Inject
 class RegisterUseCase @Inject constructor(
     private val repository: AuthRepository
 ) {
-    suspend operator fun invoke(username: String, password: String): Flow<Result<Result<User?>>> {
+    suspend operator fun invoke(email: String, username: String, password: String): Flow<Result<Result<User?>>> {
         return repository
-            .register(username, password)
+            .register(email,username, password)
             .map { Result.success(it) }
             .catch { emit(Result.failure(it)) }
     }

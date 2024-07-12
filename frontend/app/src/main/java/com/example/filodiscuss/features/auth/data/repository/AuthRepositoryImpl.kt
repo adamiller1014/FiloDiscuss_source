@@ -13,12 +13,12 @@ class AuthRepositoryImpl @Inject constructor(
     private val api: AnimistApi,
     private val userCookieJar: UserCookieJar
 ) : AuthRepository {
-    override suspend fun register(username: String, password: String): Flow<Result<User?>> {
-        return api.register(username, password)
+    override suspend fun register(email: String, username: String, password: String): Flow<Result<User?>> {
+        return api.register(email, username, password)
     }
 
-    override suspend fun login(username: String, password: String): Flow<Result<User?>> {
-        return api.login(username, password)
+    override suspend fun login(usernameOrEmail: String, password: String): Flow<Result<User?>> {
+        return api.login(usernameOrEmail, password)
     }
 
     override suspend fun getCurrentUser(): Flow<Result<User?>> {

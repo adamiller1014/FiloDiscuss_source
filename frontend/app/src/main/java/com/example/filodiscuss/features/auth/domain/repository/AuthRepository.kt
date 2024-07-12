@@ -4,9 +4,9 @@ import com.example.filodiscuss.features.auth.domain.model.User
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
-    suspend fun register(username: String, password: String): Flow<Result<User?>>
+    suspend fun register(email: String, username: String, password: String): Flow<Result<User?>>
 
-    suspend fun login(username: String, password: String): Flow<Result<User?>>
+    suspend fun login(usernameOrEmail: String, password: String): Flow<Result<User?>>
 
     suspend fun getCurrentUser(): Flow<Result<User?>>
 
