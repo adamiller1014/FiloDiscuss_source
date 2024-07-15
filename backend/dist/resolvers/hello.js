@@ -26,3 +26,4 @@ __decorate([
 exports.HelloResolver = HelloResolver = __decorate([
     (0, type_graphql_1.Resolver)()
 ], HelloResolver);
+//# sourceMappingURL=hello.js.map

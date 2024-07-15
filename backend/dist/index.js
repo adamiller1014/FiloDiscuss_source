@@ -12,10 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.AppDataSource = void 0;
 require("reflect-metadata");
-const core_1 = require("@mikro-orm/core");
 const constants_1 = require("./constants");
-const mikro_orm_config_1 = __importDefault(require("./mikro-orm.config"));
+const Post_1 = require("./entities/Post");
 const apollo_server_express_1 = require("apollo-server-express");
 const express_1 = __importDefault(require("express"));
 const type_graphql_1 = require("type-graphql");
@@ -24,23 +24,26 @@ const post_1 = require("./resolvers/post");
 const user_1 = require("./resolvers/user");
 const connect_redis_1 = __importDefault(require("connect-redis"));
 const express_session_1 = __importDefault(require("express-session"));
+const User_1 = require("./entities/User");
 const ioredis_1 = __importDefault(require("ioredis"));
+const typeorm_1 = require("typeorm");
+exports.AppDataSource = new typeorm_1.DataSource({
+    type: "postgres",
+    username: "postgres",
+    password: "12345678",
+    database: "filodiscuss2",
+    synchronize: true,
+    logging: true,
+    entities: [User_1.User, Post_1.Post],
+    subscribers: [],
+    migrations: [],
+});
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
-    //sendEmail("azza@azza.com", "Hello there !");
-    const orm = yield core_1.MikroORM.init(mikro_orm_config_1.default);
-    //await orm.em.nativeDelete(User, {});
-    yield orm.getMigrator().up();
-    // const post = orm.em.fork().create(Post, {
-    //     title: 'Foo is Bar',
-    // });
-    // await orm.em.persistAndFlush(post);
-    // const posts = await orm.em.find(Post,{});
-    // console.log(posts);
+    exports.AppDataSource.initialize().catch((error) => console.log(error));
     const app = (0, express_1.default)();
-    app.set("trust proxy", process.env.NODE_ENV !== "production"); //a little fix here from another users codes--- actually think this made it works
+    app.set("trust proxy", process.env.NODE_ENV !== "production");
     app.set("Access-Control-Allow-Origin", "https://studio.apollographql.com");
     app.set("Access-Control-Allow-Credentials", true);
-    // ___ Redis - set-up __
     const redisClient = new ioredis_1.default();
     redisClient.on("connect", () => {
         console.log("Redis connected");
@@ -61,10 +64,10 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         name: constants_1.COOKIE_NAME,
         store: redisStore,
         cookie: {
-            maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // Alive for 10 years
+            maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
             httpOnly: true,
-            sameSite: "lax", //csrf
-            secure: process.env.NODE_ENV === 'production' // cookie only works in https
+            sameSite: "none",
+            secure: true
         },
         secret: "qpwdomwqeoxqiewpoqjh",
         resave: false,
@@ -76,7 +79,6 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             validate: false
         }),
         context: ({ req, res }) => ({
-            em: orm.em,
             req,
             res,
             redis: redisClient
@@ -84,9 +86,6 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     });
     yield apolloServer.start();
     apolloServer.applyMiddleware({ app, cors });
-    // app.get('/', (_, res) => {
-    //     res.send(" Hello ");
-    // });
     app.listen(4000, () => {
         console.log('Server started on localhost:4000');
     });
@@ -94,3 +93,4 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
 main().catch(err => {
     console.error(err);
 });
+//# sourceMappingURL=index.js.map

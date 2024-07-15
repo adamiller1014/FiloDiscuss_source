@@ -1,8 +1,6 @@
 import 'reflect-metadata';
-import { MikroORM } from "@mikro-orm/core";
 import { __prod__, COOKIE_NAME } from "./constants";
 import { Post } from "./entities/Post";
-import microConfig from "./mikro-orm.config";
 import { ApolloServer } from "apollo-server-express";
 import express from "express";
 import { buildSchema } from "type-graphql";
@@ -11,17 +9,27 @@ import { PostResolver } from "./resolvers/post";
 import { UserResolver } from './resolvers/user';
 import RedisStore from "connect-redis"
 import session from "express-session"
-import { createClient } from "redis"
 import { MyContext } from './types';
-import { sendEmail } from './utils/sendEmail';
 import { User } from './entities/User';
 import Redis from 'ioredis';
+import { DataSource } from 'typeorm';
+
+export const AppDataSource = new DataSource({
+    type: "postgres",
+    username: "postgres",
+    password: "12345678",
+    database: "filodiscuss2",
+    synchronize: true,
+    logging: true,
+    entities: [User, Post],
+    subscribers: [],
+    migrations: [],
+})
 
 const main = async () => {
+    AppDataSource.initialize().catch((error) => console.log(error))
     //sendEmail("azza@azza.com", "Hello there !");
-    const orm = await MikroORM.init(microConfig);
     //await orm.em.nativeDelete(User, {});
-    await orm.getMigrator().up();
     // const post = orm.em.fork().create(Post, {
     //     title: 'Foo is Bar',
     // });
@@ -63,8 +71,8 @@ const main = async () => {
             cookie: {
                 maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // Alive for 10 years
                 httpOnly: true,
-                sameSite: "lax", //csrf
-                secure: process.env.NODE_ENV === 'production' // cookie only works in https
+                sameSite: "none", //csrf
+                secure: true // cookie only works in https
             },
             secret: "qpwdomwqeoxqiewpoqjh",
             resave: false,
@@ -78,7 +86,6 @@ const main = async () => {
             validate: false
         }),
         context: ({ req, res }): MyContext => ({
-            em: orm.em,
             req,
             res,
             redis: redisClient
