@@ -9,7 +9,8 @@ fun PostsQuery.Data.toDomain(): List<Post> {
             id = it.id,
             createdAt = it.createdAt,
             updatedAt = it.updatedAt,
-            title = it.title
+            title = it.title,
+            content = it.text
         )
     }
 }

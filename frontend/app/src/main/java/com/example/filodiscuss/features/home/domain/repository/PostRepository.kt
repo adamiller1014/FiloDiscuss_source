@@ -5,4 +5,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface PostRepository {
     suspend fun getPost() : Flow<Result<List<Post>?>>
+    suspend fun createPost(title: String, content: String): Flow<Result<Post?>>
 }

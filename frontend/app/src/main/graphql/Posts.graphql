@@ -3,6 +3,7 @@ query Posts{
         id
         createdAt
         updatedAt
-        title
+        title,
+        text
     }
 }

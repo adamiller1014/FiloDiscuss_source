@@ -1,6 +1,5 @@
 package com.example.filodiscuss.cors.navigation
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -15,12 +14,15 @@ import com.example.filodiscuss.features.auth.presentation.AuthViewModel
 import com.example.filodiscuss.features.auth.presentation.screen.LoginScreen
 import com.example.filodiscuss.features.auth.presentation.screen.SignUpScreen
 import com.example.filodiscuss.features.home.presentation.screen.HomeScreen
+import com.example.filodiscuss.features.home.presentation.screen.PostFormScreen
 
 sealed class Route(val name: String) {
     data object LoginScreen : Route("Login")
     data object SignUpScreen : Route("SignUp")
     data object HomeScreen : Route("Home")
     data object LoadingScreen : Route("Loading")
+    data object PostFormScreen : Route("PostForm")
+
 }
 
 @Composable
@@ -99,6 +101,15 @@ fun Navigation(navHostController: NavHostController) {
             HomeScreen(
                 onLogoutClick = {
                     authViewModel.logout()
+                },
+                navHostController = navHostController
+            )
+        }
+        composable(Route.PostFormScreen.name) {
+            PostFormScreen(
+                navHostController = navHostController,
+                onCancel = {
+                    navHostController.navigateUp()
                 }
             )
         }

@@ -12,4 +12,7 @@ class PostRepositoryImpl @Inject constructor(
     override suspend fun getPost(): Flow<Result<List<Post>?>> {
         return api.getPosts()
     }
+    override suspend fun createPost(title:String, content: String): Flow<Result<Post?>> {
+        return api.createPost(title, content)
+    }
 }

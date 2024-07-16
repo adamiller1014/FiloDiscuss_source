@@ -4,9 +4,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -21,6 +26,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import com.example.filodiscuss.cors.navigation.Route
 import com.example.filodiscuss.features.auth.presentation.AuthViewModel
 import com.example.filodiscuss.features.home.presentation.PostViewModel
 import com.example.filodiscuss.features.home.presentation.screen.components.PostList
@@ -31,7 +38,9 @@ import com.example.filodiscuss.features.home.presentation.state.PostListState
 fun HomeScreen(
     authViewModel: AuthViewModel = hiltViewModel(),
     postViewModel: PostViewModel = hiltViewModel(),
-    onLogoutClick: () -> Unit) {
+    onLogoutClick: () -> Unit,
+    navHostController: NavHostController
+) {
     val currentUser by authViewModel.currentUserState.collectAsState()
     val postListState by postViewModel.postListState.collectAsState()
 
@@ -65,6 +74,15 @@ fun HomeScreen(
                     containerColor = Color(0xFF6200EE),
                 )
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { navHostController.navigate(Route.PostFormScreen.name) {
+                }},
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = "Create Post")
+            }
         },
         content = { paddingValues ->
             Box(

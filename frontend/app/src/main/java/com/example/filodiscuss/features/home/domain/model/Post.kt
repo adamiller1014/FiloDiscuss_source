@@ -4,5 +4,6 @@ data class Post(
     val id: Number,
     val createdAt: String,
     val updatedAt: String,
-    val title: String
+    val title: String,
+    val content: String,
 )
