@@ -22,19 +22,47 @@ class PostViewModel @Inject constructor(
     private val _createPostState = MutableStateFlow<CreatePostState>(CreatePostState.Idle)
     val createPostState: StateFlow<CreatePostState> = _createPostState
 
+    private var limit: Int = 10
+    private var cursor: String? = null
+    private var hasMore: Boolean = true
+    var isLoadingMore: Boolean = false
+
+    init {
+        getPosts()
+    }
+
     fun getPosts() {
         _postListState.value = PostListState.Loading
         viewModelScope.launch {
-            postRepository.getPost().collect { result ->
-                result.onSuccess { posts ->
-                    if (posts != null) {
-                        _postListState.value = PostListState.Success(posts)
-                    } else {
-                        _postListState.value = PostListState.Error("No posts found.")
-                    }
+            postRepository.getPosts(cursor, limit).collect { result ->
+                result.onSuccess { postResponse ->
+                    cursor = postResponse.posts.lastOrNull()?.createdAt
+                    hasMore = postResponse.hasMore
+                    _postListState.value = PostListState.Success(postResponse.posts)
                 }.onFailure { exception ->
                     _postListState.value = PostListState.Error(exception.message ?: "Unknown error")
                 }
+            }
+        }
+    }
+
+    fun loadMorePosts() {
+        if (isLoadingMore || !hasMore) return // Avoid multiple requests and check if there are more posts
+
+        isLoadingMore = true
+        viewModelScope.launch {
+            postRepository.getPosts(cursor, limit).collect { result ->
+                result.onSuccess { postResponse ->
+                    val posts = postResponse.posts
+                    cursor = posts.lastOrNull()?.createdAt
+                    hasMore = postResponse.hasMore
+                    val currentPosts = (_postListState.value as? PostListState.Success)?.posts ?: emptyList()
+                    val updatedPosts = currentPosts + posts
+                    _postListState.value = PostListState.Success(updatedPosts)
+                }.onFailure { exception ->
+                    _postListState.value = PostListState.Error(exception.message ?: "Unknown error")
+                }
+                isLoadingMore = false
             }
         }
     }

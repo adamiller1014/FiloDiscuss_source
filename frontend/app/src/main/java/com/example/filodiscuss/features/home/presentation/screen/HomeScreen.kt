@@ -20,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -53,12 +52,22 @@ fun HomeScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = currentUser?.username ?: "Welcome",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
+                    Column {
+                        Text(
+                            text = "Filodiscuss",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        if (currentUser != null) {
+                            Text(
+                                text = "Hello, ${currentUser?.username}",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Normal,
+                                color = Color.White
+                            )
+                        }
+                    }
                 },
                 actions = {
                     if (currentUser != null) {
@@ -93,7 +102,12 @@ fun HomeScreen(
             ) {
                 when (postListState) {
                     is PostListState.Success -> {
-                        PostList(posts = (postListState as PostListState.Success).posts)
+                        val posts = (postListState as PostListState.Success).posts
+                        PostList(
+                            posts = posts,
+                            isLoading = postViewModel.isLoadingMore,
+                            onLoadMore = { postViewModel.loadMorePosts() }
+                        )
                     }
                     PostListState.Loading -> {
                         // Show loading indicator or placeholder

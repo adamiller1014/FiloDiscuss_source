@@ -27,6 +27,7 @@ const express_session_1 = __importDefault(require("express-session"));
 const User_1 = require("./entities/User");
 const ioredis_1 = __importDefault(require("ioredis"));
 const typeorm_1 = require("typeorm");
+const path_1 = __importDefault(require("path"));
 exports.AppDataSource = new typeorm_1.DataSource({
     type: "postgres",
     username: "postgres",
@@ -36,10 +37,11 @@ exports.AppDataSource = new typeorm_1.DataSource({
     logging: true,
     entities: [User_1.User, Post_1.Post],
     subscribers: [],
-    migrations: [],
+    migrations: [path_1.default.join(__dirname, "./migrations/*")],
 });
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
-    exports.AppDataSource.initialize().catch((error) => console.log(error));
+    yield exports.AppDataSource.initialize();
+    yield exports.AppDataSource.runMigrations();
     const app = (0, express_1.default)();
     app.set("trust proxy", process.env.NODE_ENV !== "production");
     app.set("Access-Control-Allow-Origin", "https://studio.apollographql.com");
@@ -66,8 +68,8 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         cookie: {
             maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
             httpOnly: true,
-            sameSite: "lax",
-            secure: process.env.NODE_ENV === 'production'
+            sameSite: "none",
+            secure: true
         },
         secret: "qpwdomwqeoxqiewpoqjh",
         resave: false,
