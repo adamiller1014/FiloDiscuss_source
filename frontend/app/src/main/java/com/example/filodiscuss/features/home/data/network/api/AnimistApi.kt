@@ -3,6 +3,7 @@ package com.example.filodiscuss.features.home.data.network.api
 import com.apollographql.apollo3.ApolloClient
 import com.apollographql.apollo3.api.Optional
 import com.example.filodiscuss.CreatePostMutation
+import com.example.filodiscuss.PostQuery
 import com.example.filodiscuss.PostsQuery
 import com.example.filodiscuss.VoteMutation
 import com.example.filodiscuss.features.home.data.network.mapper.toDomain
@@ -49,6 +50,18 @@ class AnimistApi @Inject constructor(
                 emit(Result.failure(Exception(response.errors?.firstOrNull()?.message)))
             } else {
                 emit(Result.success(response.data?.vote))
+            }
+        }
+    }
+
+    fun getPost(postId: Int): Flow<Result<Post?>> {
+        return flow {
+            val response = apolloClient.query(PostQuery(postId=postId)).execute()
+            if (response.hasErrors()) {
+                emit(Result.failure(Exception(response.errors?.firstOrNull()?.message)))
+            } else {
+                val post = response.data?.post?.toDomain()
+                emit(Result.success(post))
             }
         }
     }

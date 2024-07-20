@@ -7,13 +7,16 @@ import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.filodiscuss.cors.components.LoadingScreen
 import com.example.filodiscuss.features.auth.presentation.AuthViewModel
 import com.example.filodiscuss.features.auth.presentation.screen.LoginScreen
 import com.example.filodiscuss.features.auth.presentation.screen.SignUpScreen
 import com.example.filodiscuss.features.home.presentation.screen.HomeScreen
+import com.example.filodiscuss.features.home.presentation.screen.PostDetailScreen
 import com.example.filodiscuss.features.home.presentation.screen.PostFormScreen
 
 sealed class Route(val name: String) {
@@ -22,7 +25,7 @@ sealed class Route(val name: String) {
     data object HomeScreen : Route("Home")
     data object LoadingScreen : Route("Loading")
     data object PostFormScreen : Route("PostForm")
-
+    data object PostDetailScreen : Route("PostDetailScreen")
 }
 
 @Composable
@@ -73,7 +76,6 @@ fun Navigation(navHostController: NavHostController) {
         }
     }
 
-
     NavHost(
         navController = navHostController,
         startDestination = Route.LoadingScreen.name
@@ -112,6 +114,19 @@ fun Navigation(navHostController: NavHostController) {
                     navHostController.navigateUp()
                 }
             )
+        }
+        composable(Route.PostDetailScreen.name + "/{postId}",
+            arguments = listOf(navArgument("postId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val postId = backStackEntry.arguments?.getString("postId")
+            if (postId != null) {
+                PostDetailScreen(
+                    postId = postId.toInt(),
+                    onCancel = {
+                        navHostController.navigateUp()
+                    }
+                )
+            }
         }
     }
 }

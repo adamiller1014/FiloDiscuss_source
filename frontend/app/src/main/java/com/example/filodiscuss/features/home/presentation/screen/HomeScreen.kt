@@ -45,7 +45,10 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) {
         authViewModel.getCurrentUser()
-        postViewModel.getPosts()
+        // Fetch posts only if the list is empty
+        if ((postListState as? PostListState.Success)?.posts?.isEmpty() == true) {
+            postViewModel.getPosts()
+        }
     }
 
     Scaffold(
@@ -103,7 +106,7 @@ fun HomeScreen(
                 when (postListState) {
                     is PostListState.Success -> {
                         val posts = (postListState as PostListState.Success).posts
-                        PostList(posts = posts)
+                        PostList(posts = posts, navHostController=navHostController)
                     }
                     PostListState.Loading -> {
                         // Show loading indicator or placeholder

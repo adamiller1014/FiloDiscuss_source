@@ -20,4 +20,8 @@ class PostRepositoryImpl @Inject constructor(
     override suspend fun vote(postId: Int, value:Int): Flow<Result<Boolean?>> {
         return api.vote(postId, value)
     }
+
+    override suspend fun getPost(postId: Int): Flow<Result<Post?>> {
+        return api.getPost(postId)
+    }
 }

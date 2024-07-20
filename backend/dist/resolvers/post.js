@@ -148,7 +148,10 @@ let PostResolver = class PostResolver {
     }
     // getPostById()
     post(id) {
-        return Post_1.Post.findOneBy({ id });
+        return Post_1.Post.findOne({
+            where: { id },
+            relations: ["creator"]
+        });
     }
     // createPost()
     createPost(input_1, _a) {
