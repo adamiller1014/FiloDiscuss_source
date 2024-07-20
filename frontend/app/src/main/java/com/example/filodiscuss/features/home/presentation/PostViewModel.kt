@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.filodiscuss.features.home.domain.repository.PostRepository
 import com.example.filodiscuss.features.home.presentation.state.CreatePostState
+import com.example.filodiscuss.features.home.presentation.state.PostDetailState
 import com.example.filodiscuss.features.home.presentation.state.PostListState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,8 +23,8 @@ class PostViewModel @Inject constructor(
     private val _createPostState = MutableStateFlow<CreatePostState>(CreatePostState.Idle)
     val createPostState: StateFlow<CreatePostState> = _createPostState
 
-    private val _voteState = MutableStateFlow<Boolean?>(null) // Pair of postId and vote value
-    val voteState: StateFlow<Boolean?> = _voteState
+    private val _postDetailState = MutableStateFlow<PostDetailState>(PostDetailState.Idle)
+    val postDetailState: StateFlow<PostDetailState> = _postDetailState
 
     private var limit: Int = 10
     private var cursor: String? = null
@@ -107,6 +108,19 @@ class PostViewModel @Inject constructor(
                     }
                 }.onFailure {
                     // Handle error if needed
+                }
+            }
+        }
+    }
+
+    fun getPost(postId: Int) {
+        _postDetailState.value = PostDetailState.Loading
+        viewModelScope.launch {
+            postRepository.getPost(postId).collect { result ->
+                result.onSuccess { post ->
+                    _postDetailState.value = post?.let { PostDetailState.Success(it) }!!
+                }.onFailure { exception ->
+                    _postDetailState.value = PostDetailState.Error(exception.message ?: "Unknown error")
                 }
             }
         }
