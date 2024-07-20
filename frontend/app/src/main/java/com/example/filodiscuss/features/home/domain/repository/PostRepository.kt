@@ -7,4 +7,5 @@ import kotlinx.coroutines.flow.Flow
 interface PostRepository {
     suspend fun getPosts(cursor: String?, limit: Int): Flow<Result<PostResponse>>
     suspend fun createPost(title: String, content: String): Flow<Result<Post?>>
+    suspend fun vote(postId: Int, value: Int): Flow<Result<Boolean?>>
 }

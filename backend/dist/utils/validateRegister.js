@@ -37,4 +37,3 @@ const validateRegister = (options) => {
     return null;
 };
 exports.validateRegister = validateRegister;
-//# sourceMappingURL=validateRegister.js.map

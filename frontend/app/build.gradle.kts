@@ -110,5 +110,7 @@ dependencies {
     // SharedPreferences
     implementation ("androidx.datastore:datastore-preferences:1.0.0")
 
-
+    // icons
+    implementation (libs.androidx.material.icons.core)
+    implementation (libs.material.icons.extended)
 }

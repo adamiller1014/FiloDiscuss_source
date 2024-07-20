@@ -103,11 +103,7 @@ fun HomeScreen(
                 when (postListState) {
                     is PostListState.Success -> {
                         val posts = (postListState as PostListState.Success).posts
-                        PostList(
-                            posts = posts,
-                            isLoading = postViewModel.isLoadingMore,
-                            onLoadMore = { postViewModel.loadMorePosts() }
-                        )
+                        PostList(posts = posts)
                     }
                     PostListState.Loading -> {
                         // Show loading indicator or placeholder

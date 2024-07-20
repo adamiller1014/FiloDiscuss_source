@@ -29,4 +29,3 @@ __decorate([
 exports.UsernamePasswordInput = UsernamePasswordInput = __decorate([
     (0, type_graphql_1.InputType)()
 ], UsernamePasswordInput);
-//# sourceMappingURL=UsernamePasswordInput.js.map

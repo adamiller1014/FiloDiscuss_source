@@ -8,4 +8,3 @@ const isAuth = ({ context }, next) => {
     return next();
 };
 exports.isAuth = isAuth;
-//# sourceMappingURL=isAuth.js.map

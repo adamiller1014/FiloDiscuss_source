@@ -28,6 +28,7 @@ const User_1 = require("./entities/User");
 const ioredis_1 = __importDefault(require("ioredis"));
 const typeorm_1 = require("typeorm");
 const path_1 = __importDefault(require("path"));
+const Updoot_1 = require("./entities/Updoot");
 exports.AppDataSource = new typeorm_1.DataSource({
     type: "postgres",
     username: "postgres",
@@ -35,17 +36,27 @@ exports.AppDataSource = new typeorm_1.DataSource({
     database: "filodiscuss2",
     synchronize: true,
     logging: true,
-    entities: [User_1.User, Post_1.Post],
+    entities: [User_1.User, Post_1.Post, Updoot_1.Updoot],
     subscribers: [],
     migrations: [path_1.default.join(__dirname, "./migrations/*")],
 });
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     yield exports.AppDataSource.initialize();
     yield exports.AppDataSource.runMigrations();
+    //await Post.delete({});
+    //sendEmail("azza@azza.com", "Hello there !");
+    //await orm.em.nativeDelete(User, {});
+    // const post = orm.em.fork().create(Post, {
+    //     title: 'Foo is Bar',
+    // });
+    // await orm.em.persistAndFlush(post);
+    // const posts = await orm.em.find(Post,{});
+    // console.log(posts);
     const app = (0, express_1.default)();
-    app.set("trust proxy", process.env.NODE_ENV !== "production");
+    app.set("trust proxy", process.env.NODE_ENV !== "production"); //a little fix here from another users codes--- actually think this made it works
     app.set("Access-Control-Allow-Origin", "https://studio.apollographql.com");
     app.set("Access-Control-Allow-Credentials", true);
+    // ___ Redis - set-up __
     const redisClient = new ioredis_1.default();
     redisClient.on("connect", () => {
         console.log("Redis connected");
@@ -66,10 +77,10 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         name: constants_1.COOKIE_NAME,
         store: redisStore,
         cookie: {
-            maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
+            maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // Alive for 10 years
             httpOnly: true,
-            sameSite: "none",
-            secure: true
+            sameSite: "lax", //csrf
+            secure: process.env.NODE_ENV === 'production' // cookie only works in https
         },
         secret: "qpwdomwqeoxqiewpoqjh",
         resave: false,
@@ -88,6 +99,9 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     });
     yield apolloServer.start();
     apolloServer.applyMiddleware({ app, cors });
+    // app.get('/', (_, res) => {
+    //     res.send(" Hello ");
+    // });
     app.listen(4000, () => {
         console.log('Server started on localhost:4000');
     });
@@ -95,4 +109,3 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
 main().catch(err => {
     console.error(err);
 });
-//# sourceMappingURL=index.js.map

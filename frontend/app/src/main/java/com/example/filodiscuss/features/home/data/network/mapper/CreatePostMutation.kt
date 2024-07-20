@@ -1,6 +1,7 @@
 package com.example.filodiscuss.features.home.data.network.mapper
 
 import com.example.filodiscuss.CreatePostMutation
+import com.example.filodiscuss.features.auth.domain.model.User
 import com.example.filodiscuss.features.home.domain.model.Post
 
 fun CreatePostMutation.CreatePost.toDomain(): Post {
@@ -9,6 +10,7 @@ fun CreatePostMutation.CreatePost.toDomain(): Post {
         title = this.title,
         content = this.text,
         createdAt = this.createdAt,
-        updatedAt = this.updatedAt
+        updatedAt = this.updatedAt,
+        points = this.points
     )
 }

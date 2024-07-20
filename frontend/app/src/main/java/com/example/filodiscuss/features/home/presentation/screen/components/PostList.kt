@@ -1,36 +1,29 @@
 package com.example.filodiscuss.features.home.presentation.screen.components
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshotFlow
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.filodiscuss.features.home.domain.model.Post
+import com.example.filodiscuss.features.home.presentation.PostViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun PostList(
-    posts: List<Post>,
-    isLoading: Boolean,
     modifier: Modifier = Modifier,
-    onLoadMore: () -> Unit,
+    postViewModel: PostViewModel = hiltViewModel(),
+    posts: List<Post>,
 ) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -46,10 +39,20 @@ fun PostList(
         state = listState
     ) {
         items(posts) { post ->
-            PostItem(post = post, onClick = { })
+            PostItem(
+                post = post,
+                upVote = {
+                    if (post.voteStatus == 1) return@PostItem
+                    postViewModel.vote(postId = post.id.toInt(), value = 1)
+                },
+                downVote = {
+                    if (post.voteStatus == -1) return@PostItem
+                    postViewModel.vote(postId = post.id.toInt(), value = -1)
+                }
+            )
         }
         item {
-            if (isLoading) {
+            if (postViewModel.isLoadingMore) {
                 LoadingIndicator()
             }
         }
@@ -60,7 +63,7 @@ fun PostList(
             snapshotFlow { listState.layoutInfo.visibleItemsInfo }
                 .collect { visibleItemsInfo ->
                     if (visibleItemsInfo.isNotEmpty() && visibleItemsInfo.last().index == listState.layoutInfo.totalItemsCount - 1) {
-                        onLoadMore()
+                        postViewModel.loadMorePosts()
                     }
                 }
         }
@@ -69,7 +72,6 @@ fun PostList(
 
 @Composable
 fun LoadingIndicator() {
-    // Add your loading indicator UI here
     Text(
         text = "Loading...",
         style = MaterialTheme.typography.bodyMedium,
@@ -81,32 +83,64 @@ fun LoadingIndicator() {
     )
 }
 
-
-
 @Composable
 fun PostItem(
     post: Post,
-    onClick: () -> Unit
+    upVote: () -> Unit,
+    downVote: () -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .clickable(onClick = onClick),
+            .padding(vertical = 8.dp),
         elevation = CardDefaults.elevatedCardElevation()
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = post.title,
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = post.content,
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray
-            )
+        Row(modifier = Modifier.padding(16.dp)) {
+            Column(
+                modifier = Modifier
+                    .padding(end = 16.dp)
+                    .width(40.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                IconButton(onClick = upVote) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowUpward,
+                        contentDescription = "Upvote",
+                        tint = if (post.voteStatus == 1) MaterialTheme.colorScheme.primary else Color.Gray
+                    )
+                }
+                Text(
+                    text = post.points.toInt().toString(),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                IconButton(onClick = downVote) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowDownward,
+                        contentDescription = "Downvote",
+                        tint = if (post.voteStatus == -1) MaterialTheme.colorScheme.error else Color.Gray
+                    )
+                }
+            }
+            Column {
+                Text(
+                    text = "Posted by u/${post.creator?.username}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = post.title,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = post.content,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
+            }
         }
     }
 }

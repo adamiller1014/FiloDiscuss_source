@@ -62,11 +62,14 @@ UserResponse = __decorate([
 ], UserResponse);
 let UserResolver = class UserResolver {
     email(user, { req }) {
+        // this is the current user and its ok to show them their own email
         if (req.session.userId === user.id) {
             return user.email;
         }
+        // current user wants to see someone elses email
         return "";
     }
+    // changePassword()
     changePassword(token_1, newPassword_1, _a) {
         return __awaiter(this, arguments, void 0, function* (token, newPassword, { redis, req }) {
             if (newPassword.length <= 2) {
@@ -107,28 +110,33 @@ let UserResolver = class UserResolver {
                 password: yield argon2_1.default.hash(newPassword),
             });
             yield redis.del(key);
+            // log in user after change password
             req.session.userId = user.id;
             return { user };
         });
     }
+    // forgotPassword()
     forgotPassword(email_1, _a) {
         return __awaiter(this, arguments, void 0, function* (email, { redis }) {
             const user = yield User_1.User.findOne({ where: { email } });
             if (!user) {
+                // the email is not in the db
                 return true;
             }
             const token = (0, uuid_1.v4)();
-            yield redis.set(constants_1.FORGET_PASSWORD_PREFIX + token, user.id, "EX", 1000 * 60 * 60 * 24 * 3);
+            yield redis.set(constants_1.FORGET_PASSWORD_PREFIX + token, user.id, "EX", 1000 * 60 * 60 * 24 * 3); // 3 days
             yield (0, sendEmail_1.sendEmail)(email, `<a href="http://localhost:3000/change-password/${token}">reset password</a>`);
             return true;
         });
     }
     me({ req }) {
+        // you are not logged in
         if (!req.session.userId) {
             return null;
         }
         return User_1.User.findOne({ where: { id: req.session.userId } });
     }
+    // registerUser()
     register(options_1, _a) {
         return __awaiter(this, arguments, void 0, function* (options, { req }) {
             const errors = (0, validateRegister_1.validateRegister)(options);
@@ -138,6 +146,7 @@ let UserResolver = class UserResolver {
             const hashedPassword = yield argon2_1.default.hash(options.password);
             let user;
             try {
+                // User.create({}).save()
                 const result = yield __1.AppDataSource
                     .getRepository(User_1.User)
                     .createQueryBuilder()
@@ -153,6 +162,8 @@ let UserResolver = class UserResolver {
                 user = result.raw[0];
             }
             catch (err) {
+                //|| err.detail.includes("already exists")) {
+                // duplicate username error
                 if (err.code === "23505") {
                     return {
                         errors: [
@@ -164,10 +175,14 @@ let UserResolver = class UserResolver {
                     };
                 }
             }
+            // store user id session
+            // this will set a cookie on the user
+            // keep them logged in
             req.session.userId = user.id;
             return { user };
         });
     }
+    // login()
     login(usernameOrEmail_1, password_1, _a) {
         return __awaiter(this, arguments, void 0, function* (usernameOrEmail, password, { req }) {
             const user = yield User_1.User.findOne(usernameOrEmail.includes("@")
@@ -200,6 +215,7 @@ let UserResolver = class UserResolver {
             };
         });
     }
+    // logout
     logout({ req, res }) {
         return new Promise((resolve) => req.session.destroy((err) => {
             res.clearCookie(constants_1.COOKIE_NAME);
@@ -272,4 +288,3 @@ __decorate([
 exports.UserResolver = UserResolver = __decorate([
     (0, type_graphql_1.Resolver)(User_1.User)
 ], UserResolver);
-//# sourceMappingURL=user.js.map

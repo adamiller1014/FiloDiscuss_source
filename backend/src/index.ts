@@ -14,6 +14,7 @@ import { User } from './entities/User';
 import Redis from 'ioredis';
 import { DataSource } from 'typeorm';
 import path from 'path';
+import { Updoot } from './entities/Updoot';
 
 export const AppDataSource = new DataSource({
     type: "postgres",
@@ -22,7 +23,7 @@ export const AppDataSource = new DataSource({
     database: "filodiscuss2",
     synchronize: true,
     logging: true,
-    entities: [User, Post],
+    entities: [User, Post, Updoot],
     subscribers: [],
     migrations: [path.join(__dirname, "./migrations/*")],
 })
@@ -74,8 +75,8 @@ const main = async () => {
             cookie: {
                 maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // Alive for 10 years
                 httpOnly: true,
-                sameSite: "none", //csrf
-                secure: true // cookie only works in https
+                sameSite: "lax", //csrf
+                secure: process.env.NODE_ENV === 'production' // cookie only works in https
             },
             secret: "qpwdomwqeoxqiewpoqjh",
             resave: false,

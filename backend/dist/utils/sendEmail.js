@@ -16,13 +16,15 @@ exports.sendEmail = sendEmail;
 const nodemailer_1 = __importDefault(require("nodemailer"));
 function sendEmail(to, html) {
     return __awaiter(this, void 0, void 0, function* () {
+        // const testAccount = await nodemailer.createTestAccount();
+        // console.log('testAccout', testAccount);
         const transporter = nodemailer_1.default.createTransport({
             host: "smtp.ethereal.email",
             port: 587,
             secure: false,
             auth: {
-                user: 'btl3xzpxaze3ievo@ethereal.email',
-                pass: 'q227PGWXrPRrjCMAmJ'
+                user: 'btl3xzpxaze3ievo@ethereal.email', //testAccount.user,
+                pass: 'q227PGWXrPRrjCMAmJ' //testAccount.pass,
             },
             tls: {
                 rejectUnauthorized: false
@@ -38,4 +40,3 @@ function sendEmail(to, html) {
         console.log("Preview URL: %s", nodemailer_1.default.getTestMessageUrl(info));
     });
 }
-//# sourceMappingURL=sendEmail.js.map

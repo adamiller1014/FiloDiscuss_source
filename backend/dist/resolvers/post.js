@@ -26,6 +26,7 @@ const type_graphql_1 = require("type-graphql");
 const Post_1 = require("../entities/Post");
 const __1 = require("..");
 const isAuth_1 = require("../middleware/isAuth");
+const Updoot_1 = require("../entities/Updoot");
 let PostInput = class PostInput {
 };
 __decorate([
@@ -53,16 +54,57 @@ PaginatedPosts = __decorate([
     (0, type_graphql_1.ObjectType)()
 ], PaginatedPosts);
 let PostResolver = class PostResolver {
+    // slice post text before sending it to the client
     textSnippet(post) {
         return post.text.slice(0, 50);
     }
-    posts(limit, cursor) {
-        return __awaiter(this, void 0, void 0, function* () {
+    // votePost()
+    vote(postId_1, value_1, _a) {
+        return __awaiter(this, arguments, void 0, function* (postId, value, { req }) {
+            const isUpdoot = value !== -1;
+            const realValue = isUpdoot ? 1 : -1;
+            const { userId } = req.session;
+            const updoot = yield Updoot_1.Updoot.findOne({ where: { postId, userId } });
+            // the user has voted on the post before
+            // and they are changing their vote
+            if (updoot && updoot.value !== realValue) {
+                yield __1.AppDataSource.transaction((tm) => __awaiter(this, void 0, void 0, function* () {
+                    yield tm.query(`
+                     update updoot
+                     set value = $1
+                     where "postId" = $2 and "userId" = $3
+                     `, [realValue, postId, userId]);
+                    yield tm.query(` update post
+                    set points = points + $1
+                    where id = $2`, [2 * realValue, postId]);
+                }));
+            }
+            else if (!updoot) {
+                // has never voted before
+                yield __1.AppDataSource.transaction((tm) => __awaiter(this, void 0, void 0, function* () {
+                    yield tm.query(`insert into updoot ("userId", "postId", value)
+                      values ($1, $2, $3)`, [userId, postId, realValue]);
+                    yield tm.query(`update post
+                    set points = points + $1
+                    where id = $2`, [realValue, postId]);
+                }));
+            }
+            return true;
+        });
+    }
+    // getPosts()
+    posts(limit_1, cursor_1, _a) {
+        return __awaiter(this, arguments, void 0, function* (limit, cursor, { req }) {
             const realLimit = Math.min(50, limit);
             const realLimitPlusOne = realLimit + 1;
             const replacements = [realLimitPlusOne];
+            if (req.session.userId) {
+                replacements.push(req.session.userId);
+            }
+            let cursorIndex = 3;
             if (cursor) {
                 replacements.push(new Date(parseInt(cursor)));
+                cursorIndex = replacements.length;
             }
             const posts = yield __1.AppDataSource.query(`
             select p.*,
@@ -73,26 +115,48 @@ let PostResolver = class PostResolver {
             'createdAt', u."createdAt",
             'updatedAt', u."updatedAt"
              ) creator
+            ${req.session.userId
+                ? ',(select value from updoot where "userId" = $2 and "postId" = p.id) "voteStatus"'
+                : 'null as "voteStatus"'}
             from post p
             inner join public.user u on u.id = p."creatorId"
-            ${cursor ? `where p."createdAt" < $2` : ""}
+            ${cursor ? `where p."createdAt" < $${cursorIndex}` : ""}
             order by p."createdAt" DESC 
             limit $1
             `, replacements);
+            // const qb = await AppDataSource
+            //     .getRepository(Post)
+            //     .createQueryBuilder("p")
+            //     .innerJoinAndSelect(
+            //         "p.creator",
+            //         "u",
+            //         'u.id = p."creatorId"',
+            //     )
+            //     .orderBy('p."createdAt"', "DESC")
+            //     .take(realLimitPlusOne)
+            // limit item after that cursor
+            // if (cursor) {
+            //     qb.where('p."createdAt" < :cursor',
+            //         { cursor: new Date(parseInt(cursor)) })
+            // }
+            // const posts = await qb.getMany()
             return {
                 posts: posts.slice(0, realLimit),
                 hasMore: posts.length === realLimitPlusOne
             };
         });
     }
+    // getPostById()
     post(id) {
         return Post_1.Post.findOneBy({ id });
     }
+    // createPost()
     createPost(input_1, _a) {
         return __awaiter(this, arguments, void 0, function* (input, { req }) {
             return Post_1.Post.create(Object.assign(Object.assign({}, input), { creatorId: req.session.userId })).save();
         });
     }
+    // updatePost
     updatePost(id_1, title_1, text_1, _a) {
         return __awaiter(this, arguments, void 0, function* (id, title, text, { req }) {
             const result = yield __1.AppDataSource.getRepository(Post_1.Post)
@@ -108,6 +172,7 @@ let PostResolver = class PostResolver {
             return result.raw[0];
         });
     }
+    // deletePost()
     deletePost(id_1, _a) {
         return __awaiter(this, arguments, void 0, function* (id, { req }) {
             const post = yield Post_1.Post.findOneBy({ id });
@@ -132,11 +197,22 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], PostResolver.prototype, "textSnippet", null);
 __decorate([
+    (0, type_graphql_1.Mutation)(() => Boolean),
+    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuth),
+    __param(0, (0, type_graphql_1.Arg)("postId", () => type_graphql_1.Int)),
+    __param(1, (0, type_graphql_1.Arg)("value", () => type_graphql_1.Int)),
+    __param(2, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Number, Object]),
+    __metadata("design:returntype", Promise)
+], PostResolver.prototype, "vote", null);
+__decorate([
     (0, type_graphql_1.Query)(() => PaginatedPosts),
     __param(0, (0, type_graphql_1.Arg)("limit", () => type_graphql_1.Int)),
     __param(1, (0, type_graphql_1.Arg)("cursor", () => String, { nullable: true })),
+    __param(2, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:paramtypes", [Number, Object, Object]),
     __metadata("design:returntype", Promise)
 ], PostResolver.prototype, "posts", null);
 __decorate([
@@ -176,4 +252,3 @@ __decorate([
 exports.PostResolver = PostResolver = __decorate([
     (0, type_graphql_1.Resolver)(Post_1.Post)
 ], PostResolver);
-//# sourceMappingURL=post.js.map

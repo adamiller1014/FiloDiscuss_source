@@ -28,6 +28,8 @@ type Post {
 
   points: Float!
 
+  voteStatus: Int
+
   creatorId: Float!
 
   creator: User!
@@ -43,6 +45,11 @@ type Post {
 The `Float` scalar type represents signed double-precision fractional values as specified by [IEEE 754](https://en.wikipedia.org/wiki/IEEE_floating_point).
 """
 scalar Float
+
+"""
+The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.
+"""
+scalar Int
 
 type User {
   id: Float!
@@ -61,12 +68,9 @@ The `Boolean` scalar type represents `true` or `false`.
 """
 scalar Boolean
 
-"""
-The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.
-"""
-scalar Int
-
 type Mutation {
+  vote(value: Int!, postId: Int!): Boolean!
+
   createPost(input: PostInput!): Post!
 
   updatePost(text: String!, title: String!, id: Int!): Post

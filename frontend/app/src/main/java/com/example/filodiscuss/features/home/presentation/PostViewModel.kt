@@ -22,6 +22,9 @@ class PostViewModel @Inject constructor(
     private val _createPostState = MutableStateFlow<CreatePostState>(CreatePostState.Idle)
     val createPostState: StateFlow<CreatePostState> = _createPostState
 
+    private val _voteState = MutableStateFlow<Boolean?>(null) // Pair of postId and vote value
+    val voteState: StateFlow<Boolean?> = _voteState
+
     private var limit: Int = 10
     private var cursor: String? = null
     private var hasMore: Boolean = true
@@ -75,6 +78,35 @@ class PostViewModel @Inject constructor(
                     if (post != null) _createPostState.value = CreatePostState.Success(post)
                 }.onFailure { exception ->
                     _createPostState.value = CreatePostState.Error(exception.message ?: "Unknown error")
+                }
+            }
+        }
+    }
+
+    fun vote(postId: Int, value: Int) {
+        viewModelScope.launch {
+            postRepository.vote(postId, value).collect { result ->
+                result.onSuccess { isVoted ->
+                    if (isVoted == true) {
+                        _postListState.value = (_postListState.value as? PostListState.Success)?.let { postListState ->
+                            val updatedPosts = postListState.posts.map { post ->
+                                if (post.id.toInt() == postId) {
+                                    val newPoints = when {
+                                        post.voteStatus?.toInt() == value -> post.points.toInt()
+                                        post.voteStatus == null || post.voteStatus == 0 -> post.points.toInt() + value
+                                        else -> post.points.toInt() + value * 2
+                                    }
+                                    post.copy(
+                                        points = newPoints,
+                                        voteStatus = value
+                                    )
+                                } else post
+                            }
+                            PostListState.Success(updatedPosts)
+                        } ?: _postListState.value
+                    }
+                }.onFailure {
+                    // Handle error if needed
                 }
             }
         }
