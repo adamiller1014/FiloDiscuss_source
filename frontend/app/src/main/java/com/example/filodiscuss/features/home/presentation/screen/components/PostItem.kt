@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -31,16 +32,27 @@ fun PostItem(
     upVote: () -> Unit,
     downVote: () -> Unit,
     onClick: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onEdit: (String, String) -> Unit
 ) {
     var showMenu by rememberSaveable { mutableStateOf(false) }
+    var showEditDialog by rememberSaveable { mutableStateOf(false) }
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
     var pressOffset by remember { mutableStateOf(DpOffset.Zero) }
     var itemHeight by remember { mutableStateOf(0.dp) }
     val interactionSource = remember { MutableInteractionSource() }
     val density = LocalDensity.current
 
-
+    if (showEditDialog) {
+        EditPostDialog(
+            post = post,
+            onDismiss = { showEditDialog = false },
+            onEdit = { newTitle, newContent ->
+                onEdit(newTitle, newContent)
+                showEditDialog = false
+            }
+        )
+    }
 
     if (showDeleteDialog) {
         DeletePostDialog(
@@ -77,7 +89,7 @@ fun PostItem(
                     )
                 }
                 Text(
-                    text = post.points.toInt().toString(),
+                    text = post.points!!.toInt().toString(),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -138,7 +150,16 @@ fun PostItem(
                     onDismissRequest = { showMenu = false },
                     offset = pressOffset.copy(y = pressOffset.y - itemHeight)
                 ) {
-
+                    DropdownMenuItem(
+                        text = { Text(text = "Edit") },
+                        leadingIcon = {
+                            Icon(imageVector = Icons.Filled.Edit, contentDescription = "Edit")
+                        },
+                        onClick = {
+                            showMenu = false
+                            showEditDialog = true
+                        }
+                    )
                     DropdownMenuItem(
                         text = { Text(text = "Delete") },
                         leadingIcon = {

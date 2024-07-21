@@ -169,8 +169,9 @@ export class PostResolver {
         }).save();
     }
 
-    // updatePost
+    // updatePost()
     @Mutation(() => Post, { nullable: true })
+    @UseMiddleware(isAuth)
     async updatePost(
         @Arg("id", () => Int) id: number,
         @Arg("title") title: string,

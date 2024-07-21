@@ -4,11 +4,11 @@ import com.example.filodiscuss.features.auth.domain.model.User
 
 data class Post(
     val id: Number,
-    val createdAt: String,
-    val updatedAt: String,
+    val createdAt: String? = null,
+    val updatedAt: String? = null,
     val title: String,
     val content: String,
     val creator: User? = null,
-    val points: Number,
+    val points: Number ? = null,
     val voteStatus : Number? = null
 )

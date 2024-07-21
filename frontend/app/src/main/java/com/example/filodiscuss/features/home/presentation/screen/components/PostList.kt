@@ -53,6 +53,9 @@ fun PostList(
                 },
                 onDelete = {
                     postViewModel.deletePost(postId = post.id.toInt())
+                },
+                onEdit = { newTitle, newContent ->
+                    postViewModel.editPost(postId = post.id.toInt(), title = newTitle, content = newContent)
                 }
             )
         }

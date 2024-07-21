@@ -159,7 +159,7 @@ let PostResolver = class PostResolver {
             return Post_1.Post.create(Object.assign(Object.assign({}, input), { creatorId: req.session.userId })).save();
         });
     }
-    // updatePost
+    // updatePost()
     updatePost(id_1, title_1, text_1, _a) {
         return __awaiter(this, arguments, void 0, function* (id, title, text, { req }) {
             const result = yield __1.AppDataSource.getRepository(Post_1.Post)
@@ -238,6 +238,7 @@ __decorate([
 ], PostResolver.prototype, "createPost", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => Post_1.Post, { nullable: true }),
+    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuth),
     __param(0, (0, type_graphql_1.Arg)("id", () => type_graphql_1.Int)),
     __param(1, (0, type_graphql_1.Arg)("title")),
     __param(2, (0, type_graphql_1.Arg)("text")),

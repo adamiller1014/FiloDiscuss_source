@@ -93,9 +93,10 @@ class PostViewModel @Inject constructor(
                             val updatedPosts = postListState.posts.map { post ->
                                 if (post.id.toInt() == postId) {
                                     val newPoints = when {
-                                        post.voteStatus?.toInt() == value -> post.points.toInt()
-                                        post.voteStatus == null || post.voteStatus == 0 -> post.points.toInt() + value
-                                        else -> post.points.toInt() + value * 2
+                                        post.voteStatus?.toInt() == value -> post.points?.toInt()
+                                        post.voteStatus == null || post.voteStatus == 0 -> post.points?.toInt()
+                                            ?.plus(value)
+                                        else -> post.points?.toInt()?.plus(value * 2)
                                     }
                                     post.copy(
                                         points = newPoints,
@@ -136,6 +137,27 @@ class PostViewModel @Inject constructor(
                     } ?: _postListState.value
                 }.onFailure { exception ->
                     // Handle error
+                    _postListState.value = PostListState.Error(exception.message ?: "Unknown error")
+                }
+            }
+        }
+    }
+
+    fun editPost(postId: Int, title: String, content: String) {
+        viewModelScope.launch {
+            postRepository.updatePost(postId, title, content).collect { result ->
+                result.onSuccess { updatedPost ->
+                    _postListState.value = (_postListState.value as? PostListState.Success)?.let { postListState ->
+                        val updatedPosts = postListState.posts.map { post ->
+                            if (post.id.toInt() == postId) {
+                                post.copy(title = updatedPost!!.title, content = updatedPost.content)
+                            } else {
+                                post
+                            }
+                        }
+                        PostListState.Success(updatedPosts)
+                    } ?: _postListState.value
+                }.onFailure { exception ->
                     _postListState.value = PostListState.Error(exception.message ?: "Unknown error")
                 }
             }

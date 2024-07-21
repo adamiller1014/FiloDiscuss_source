@@ -28,4 +28,8 @@ class PostRepositoryImpl @Inject constructor(
     override suspend fun deletePost(postId: Int): Flow<Result<Boolean?>> {
         return api.deletePost(postId)
     }
+
+    override suspend fun updatePost(postId: Int, title:String, content: String): Flow<Result<Post?>>{
+        return api.updatePost(postId,title,content)
+    }
 }
