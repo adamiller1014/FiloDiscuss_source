@@ -15,6 +15,8 @@ import Redis from 'ioredis';
 import { DataSource } from 'typeorm';
 import path from 'path';
 import { Updoot } from './entities/Updoot';
+import { createUserLoader } from './utils/createUserLoader';
+import { createUpdootLoader } from './utils/createUpdootLoader';
 
 export const AppDataSource = new DataSource({
     type: "postgres",
@@ -92,7 +94,9 @@ const main = async () => {
         context: ({ req, res }): MyContext => ({
             req,
             res,
-            redis: redisClient
+            redis: redisClient,
+            userLoader: createUserLoader(),
+            updootLoader: createUpdootLoader(),
         })
     });
 

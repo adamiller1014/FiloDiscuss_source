@@ -29,6 +29,8 @@ const ioredis_1 = __importDefault(require("ioredis"));
 const typeorm_1 = require("typeorm");
 const path_1 = __importDefault(require("path"));
 const Updoot_1 = require("./entities/Updoot");
+const createUserLoader_1 = require("./utils/createUserLoader");
+const createUpdootLoader_1 = require("./utils/createUpdootLoader");
 exports.AppDataSource = new typeorm_1.DataSource({
     type: "postgres",
     username: "postgres",
@@ -94,7 +96,9 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         context: ({ req, res }) => ({
             req,
             res,
-            redis: redisClient
+            redis: redisClient,
+            userLoader: (0, createUserLoader_1.createUserLoader)(),
+            updootLoader: (0, createUpdootLoader_1.createUpdootLoader)(),
         })
     });
     yield apolloServer.start();

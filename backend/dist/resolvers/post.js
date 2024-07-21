@@ -27,6 +27,7 @@ const Post_1 = require("../entities/Post");
 const __1 = require("..");
 const isAuth_1 = require("../middleware/isAuth");
 const Updoot_1 = require("../entities/Updoot");
+const User_1 = require("../entities/User");
 let PostInput = class PostInput {
 };
 __decorate([
@@ -57,6 +58,22 @@ let PostResolver = class PostResolver {
     // slice post text before sending it to the client
     textSnippet(post) {
         return post.text.slice(0, 50);
+    }
+    // fetch the user once
+    creator(post, { userLoader }) {
+        return userLoader.load(post.creatorId);
+    }
+    voteStatus(post_1, _a) {
+        return __awaiter(this, arguments, void 0, function* (post, { updootLoader, req }) {
+            if (!req.session.userId) {
+                return null;
+            }
+            const updoot = yield updootLoader.load({
+                postId: post.id,
+                userId: req.session.userId,
+            });
+            return updoot ? updoot.value : null;
+        });
     }
     // votePost()
     vote(postId_1, value_1, _a) {
@@ -98,29 +115,13 @@ let PostResolver = class PostResolver {
             const realLimit = Math.min(50, limit);
             const realLimitPlusOne = realLimit + 1;
             const replacements = [realLimitPlusOne];
-            if (req.session.userId) {
-                replacements.push(req.session.userId);
-            }
-            let cursorIndex = 3;
             if (cursor) {
                 replacements.push(new Date(parseInt(cursor)));
-                cursorIndex = replacements.length;
             }
             const posts = yield __1.AppDataSource.query(`
-            select p.*,
-            json_build_object(
-            'id', u.id,
-            'username' , u.username,
-            'email', u.email,
-            'createdAt', u."createdAt",
-            'updatedAt', u."updatedAt"
-             ) creator
-            ${req.session.userId
-                ? ',(select value from updoot where "userId" = $2 and "postId" = p.id) "voteStatus"'
-                : 'null as "voteStatus"'}
+            select p.*
             from post p
-            inner join public.user u on u.id = p."creatorId"
-            ${cursor ? `where p."createdAt" < $${cursorIndex}` : ""}
+            ${cursor ? `where p."createdAt" < $2` : ""}
             order by p."createdAt" DESC 
             limit $1
             `, replacements);
@@ -148,10 +149,7 @@ let PostResolver = class PostResolver {
     }
     // getPostById()
     post(id) {
-        return Post_1.Post.findOne({
-            where: { id },
-            relations: ["creator"]
-        });
+        return Post_1.Post.findOneBy({ id });
     }
     // createPost()
     createPost(input_1, _a) {
@@ -201,6 +199,22 @@ __decorate([
     __metadata("design:paramtypes", [Post_1.Post]),
     __metadata("design:returntype", void 0)
 ], PostResolver.prototype, "textSnippet", null);
+__decorate([
+    (0, type_graphql_1.FieldResolver)(() => User_1.User),
+    __param(0, (0, type_graphql_1.Root)()),
+    __param(1, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Post_1.Post, Object]),
+    __metadata("design:returntype", void 0)
+], PostResolver.prototype, "creator", null);
+__decorate([
+    (0, type_graphql_1.FieldResolver)(() => type_graphql_1.Int, { nullable: true }),
+    __param(0, (0, type_graphql_1.Root)()),
+    __param(1, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Post_1.Post, Object]),
+    __metadata("design:returntype", Promise)
+], PostResolver.prototype, "voteStatus", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => Boolean),
     (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuth),
