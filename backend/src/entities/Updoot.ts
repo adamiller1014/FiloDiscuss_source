@@ -25,6 +25,9 @@ export class Updoot extends BaseEntity {
     @PrimaryColumn()
     postId: number;
 
-    @ManyToOne(() => Post, (post) => post.updoots)
+    // Cascade way to delete the updoots for a post
+    @ManyToOne(() => Post, (post) => post.updoots, {
+        onDelete: "CASCADE",
+    })
     post: Post;
 }

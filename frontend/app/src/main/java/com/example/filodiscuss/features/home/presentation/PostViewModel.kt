@@ -125,4 +125,21 @@ class PostViewModel @Inject constructor(
             }
         }
     }
+
+    fun deletePost(postId: Int) {
+        viewModelScope.launch {
+            postRepository.deletePost(postId).collect { result ->
+                result.onSuccess {
+                    _postListState.value = (_postListState.value as? PostListState.Success)?.let { postListState ->
+                        val updatedPosts = postListState.posts.filterNot { it.id.toInt() == postId }
+                        PostListState.Success(updatedPosts)
+                    } ?: _postListState.value
+                }.onFailure { exception ->
+                    // Handle error
+                    _postListState.value = PostListState.Error(exception.message ?: "Unknown error")
+                }
+            }
+        }
+    }
+
 }

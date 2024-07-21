@@ -9,4 +9,5 @@ interface PostRepository {
     suspend fun createPost(title: String, content: String): Flow<Result<Post?>>
     suspend fun vote(postId: Int, value: Int): Flow<Result<Boolean?>>
     suspend fun getPost(postId: Int): Flow<Result<Post?>>
+    suspend fun deletePost(postId: Int): Flow<Result<Boolean?>>
 }
